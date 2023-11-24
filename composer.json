@@ -1,0 +1,34 @@
+{
+    "name": "mansi/website-analytics",
+    "description": "This package is used to analyisis of module wise work log of our website",
+    "license": "MIT",
+    "keywords": [
+      "laravel",
+      "php",
+      "analysis"
+    ],
+    "authors": [
+        {
+            "name": "Mansi Thakkar",
+            "email": "mansi.t@webcodegenie.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Mansi\\WebsiteAnalytics\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4",
+        "laravel/framework": "^8.0",
+        "guzzlehttp/guzzle": "^7.7"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Packages\\Mansi\\WebsiteAnalytics\\Providers\\WebsiteAnalyticsServiceProvider"
+            ]
+        }
+    }
+}
