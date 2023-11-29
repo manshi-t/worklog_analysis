@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 
 class ModuleWiseLogAnalysisController
 {
+    private $dir = 'logs';
     /**
      * get all directory name inside log directory.
      */
-    public function getLogFiles(Request $request)
+    public function index(Request $request)
     {
-        $dir = storage_path('logs');
+        $dir = storage_path($this->dir);
         $folderNames = [];
         $i = 0;
         $dirList = scandir($dir);
@@ -29,15 +30,12 @@ class ModuleWiseLogAnalysisController
     /**
      * get all files name from given subdirectory of log directory.
      */
-    public function getData($dir){
+    public function getFiles($dir){
         $fileNames = [];
         $path = storage_path('logs');
         $files = File::allFiles($path.'/'.$dir);
-
         foreach($files as $file) {
-            if (pathinfo($file)['extension'] == 'log') {
-                array_push($fileNames, pathinfo($file)['filename'].'.'.pathinfo($file)['extension']);
-            }
+            array_push($fileNames, pathinfo($file)['filename'].'.'.pathinfo($file)['extension']);
         }
         return response()->json($fileNames);
     }

@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Website Analytics</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.4/pagination.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.4/pagination.min.js"></script>
 </head>
 <body>
     <div class="row">
@@ -26,10 +28,9 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 ms-5">
-            <ul id="fileData">
-            </ul>
+        <div class="col-6 ms-5" id="fileData">
         </div>
+        <div id="pagination" class="ms-5"></div>
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -46,7 +47,7 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary" onclick="setUrl()">View Full Page</button>
+                  <button type="button" class="btn btn-primary" onclick="setUrl()" id="full-page">View Full Page</button>
                 </div>
             </div>
         </div>
@@ -61,6 +62,7 @@
 
     //get file name and content of selected directory
     function showData() {
+        
         var dir = $('#moduleData').val();
         var base_path = "{{ url('/') }}/";
         //ajax call for getting file name
@@ -70,28 +72,52 @@
             data: { },
             dataType: 'json',
             success: function(res){
-                res.forEach(function(name) {
+                if (res == "") {
                     $('#fileData').append(
-                        '<li data-bs-toggle="modal" data-bs-target="#exampleModal" id="'+name+'" class="log-file">'+ name +'</li>'
+                        '<p>This Folder is empty.</p>'
                     );
-                });
-                $(".log-file").on('click', function () {
-                    var name = $(this).attr('id');
-                    var dir = $('#moduleData').val();
-                    var base_path = "{{ url('/') }}/";
-                    //ajax call for getting content of file
-                    $.ajax({
-                        type: "get",
-                        url: "log/"+ dir + '/' + name,
-                        data: { },
-                        dataType: 'json',
-                        success: function(res){
-                            $('#exampleModal').find('.modal-title').text(name).end()
-                            .find('.modal-body p').text(res).end()
-                            .modal('show');
-                        }
-                    });
-                });
+                } else {
+                    $(function () {
+                        let container = $('#pagination');
+                        container.pagination({
+                            dataSource: res,
+                            pageSize: 20,
+                            callback: function (data, pagination) {
+                                var dataHtml = '<ul>';
+                                $.each(data, function (index, item) {
+                                    dataHtml += '<li class="log-file" data-bs-toggle="modal" data-bs-target="#exampleModal" id="'+item+'">' + item + '</li>';
+                                });
+                                dataHtml += '</ul>';
+                                $("#fileData").html(dataHtml);
+
+                                $(".log-file").on('click', function () {
+                                    var name = $(this).attr('id');
+                                    var dir = $('#moduleData').val();
+                                    var base_path = "{{ url('/') }}/";
+                                    //ajax call for getting content of file
+                                    $.ajax({
+                                        type: "get",
+                                        url: "log/"+ dir + '/' + name,
+                                        data: { },
+                                        dataType: 'json',
+                                        success: function(res){
+                                            if (res == "") {
+                                                $('#exampleModal').find('.modal-title').text(name).end()
+                                                .find('.modal-body p').text('File is empty.').end()
+                                                .modal('show');
+                                                $('#full-page').attr('disabled','disabled');
+                                            }else{
+                                                $('#exampleModal').find('.modal-title').text(name).end()
+                                                .find('.modal-body p').text(res).end()
+                                                .modal('show');
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                        })
+                    })
+                }
             }
         });
     }

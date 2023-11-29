@@ -14,8 +14,8 @@ use Mansi\WebsiteAnalytics\Controllers\ModuleWiseLogAnalysisController;
 |
 */
 
-Route::get('/analysis',[ModuleWiseLogAnalysisController::class,'getLogFiles']);
+Route::get('/analysis',[ModuleWiseLogAnalysisController::class,'index']);
 Route::get('/log/{dir}/{data}',[ModuleWiseLogAnalysisController::class,'getFileContent']);
-Route::post('/getdata/{dir}',[ModuleWiseLogAnalysisController::class,'getData']);
+Route::post('/getdata/{dir}',[ModuleWiseLogAnalysisController::class,'getFiles']);
 Route::view('/index','analytics::index');
 Route::view('/log-detail','analytics::log-details')->name('log');
