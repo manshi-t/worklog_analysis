@@ -2,8 +2,11 @@
 
 namespace Mansi\WebsiteAnalytics\Controllers;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ModuleWiseLogAnalysisController
 {
@@ -37,7 +40,8 @@ class ModuleWiseLogAnalysisController
         foreach($files as $file) {
             array_push($fileNames, pathinfo($file)['filename'].'.'.pathinfo($file)['extension']);
         }
-        return response()->json($fileNames);
+        $data = $this->paginate($fileNames);
+        return response()->json($data);
     }
 
     /**
@@ -47,5 +51,17 @@ class ModuleWiseLogAnalysisController
         $path = storage_path('logs');
         $content = file_get_contents($path.'/'.$dir.'/'.$data);
         return response()->json($content);
+    }
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }
