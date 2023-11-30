@@ -64,16 +64,17 @@
     //clear data of last selected option
     function clearData() {
         $('#fileData').children().remove();
+        $('.pagination').children().remove();
     }
 
     //get file name and content of selected directory
-    function showData(url=null) {
+    function showData(page) {
         var dir = $('#moduleData').val();
         var base_path = "{{ url('/') }}/";
         //ajax call for getting file name
         $.ajax({
             type: "post",
-            url: (url) ? "getdata/" + dir + url : "getdata/" + dir +'/' +url,
+            url: (page) ? "getdata/" + dir + page : "getdata/" + dir,
             data: {},
             dataType: 'json',
             success: function(res) {
@@ -121,9 +122,10 @@
                     
                     $('.paginate-button').on('click', function() {
                         var url = $(this).attr('data-url');
+                        var page = url.replace('/','');
                         $('#fileData').children().remove();
                         $('.pagination').children().remove();
-                        showData(url);
+                        showData(page);
                     });
                     $(".log-file").on('click', function() {
                         var name = $(this).attr('id');

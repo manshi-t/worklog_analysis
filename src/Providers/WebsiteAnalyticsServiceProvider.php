@@ -11,8 +11,12 @@ class WebsiteAnalyticsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-        $this->loadViewsFrom(__DIR__.'/../views', 'analytics');
+        $this->publishes([
+            __DIR__.'/../routes/web.php' =>  base_path('routes/web.php'),
+        ], 'analysis_route');
+        $this->publishes([
+            __DIR__.'/../views/index.blade.php' =>  resource_path('views/index.blade.php'),
+        ], 'analysis_view');
     }
 
     /**

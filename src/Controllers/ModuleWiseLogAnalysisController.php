@@ -11,6 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class ModuleWiseLogAnalysisController
 {
     private $dir = 'logs';
+    private $perPageRecord = 20;
     /**
      * get all directory name inside log directory.
      */
@@ -27,14 +28,13 @@ class ModuleWiseLogAnalysisController
             $i++;
             }
         }
-        return view('analytics::index',compact('folderNames'));
+        return $folderNames;
     }
 
     /**
      * get all files name from given subdirectory of log directory.
      */
-    public function getFiles($dir,$url=null){
-        // dd($url);
+    public function getFiles($dir){
         $fileNames = [];
         $path = storage_path('logs');
         $files = File::allFiles($path.'/'.$dir);
@@ -63,6 +63,6 @@ class ModuleWiseLogAnalysisController
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $this->perPageRecord, $page, $options);
     }
 }
