@@ -32,6 +32,9 @@
         <div class="col-6 ms-5">
             <ul id="fileData"></ul>
         </div>
+        <div class="pagination ms-5">
+
+        </div>
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -64,13 +67,13 @@
     }
 
     //get file name and content of selected directory
-    function showData() {
+    function showData(url=null) {
         var dir = $('#moduleData').val();
         var base_path = "{{ url('/') }}/";
         //ajax call for getting file name
         $.ajax({
             type: "post",
-            url: "getdata/" + dir,
+            url: (url) ? "getdata/" + dir + url : "getdata/" + dir +'/' +url,
             data: {},
             dataType: 'json',
             success: function(res) {
@@ -79,16 +82,48 @@
                         '<p>This Folder is empty.</p>'
                     );
                 } else {
-                    res['data'].forEach(function(name) {
+                    if (res['data'].length > 1) {
+                        res['data'].forEach(function(name) {
+                            $('#fileData').append(
+                                '<li class="log-file" data-bs-toggle="modal" data-bs-target="#exampleModal" id="' +
+                                name + '">' + name + '</li>'
+                            );
+                        });
+                        res['links'].forEach(function(link) {
+                            if (link['url'] == null) {
+                                $('.pagination').append(
+                                    '<button type="button" class="btn btn-primary ms-2" data-url="'+link['url']+'" disabled>'+link['label']+'</button>'
+                                );
+                            } else {
+                                $('.pagination').append(
+                                    '<button type="button" class="btn btn-primary ms-2 paginate-button" data-url="'+link['url']+'">'+link['label']+'</button>'
+                                );
+                            }
+                        });
+                    } else {
+                        data = Object.entries(res['data']);
                         $('#fileData').append(
                             '<li class="log-file" data-bs-toggle="modal" data-bs-target="#exampleModal" id="' +
-                            name + '">' + name + '</li>'
+                            data[0][1] + '">' + data[0][1] + '</li>'
                         );
-                    });
-                    res['links'].forEach(function(link) {
-                        $('#fileData').append(
-                            '<button type="button" class="btn btn-primary ms-2">'+link['label']+'</button>'
-                        );
+                        res['links'].forEach(function(link) {
+                            if (link['url'] == null) {
+                                $('.pagination').append(
+                                    '<button type="button" class="btn btn-primary ms-2" data-url="'+link['url']+'" disabled>'+link['label']+'</button>'
+                                );
+                            } else {
+                                $('.pagination').append(
+                                    '<button type="button" class="btn btn-primary ms-2 paginate-button" data-url="'+link['url']+'">'+link['label']+'</button>'
+                                );
+                            }
+                        });
+                    }
+                    
+                    $('.paginate-button').on('click', function() {
+                        var url = $(this).attr('data-url');
+                        $('#fileData').children().remove();
+                        $('.pagination').children().remove();
+                        showData(url);
                     });
                     $(".log-file").on('click', function() {
                         var name = $(this).attr('id');

@@ -33,7 +33,8 @@ class ModuleWiseLogAnalysisController
     /**
      * get all files name from given subdirectory of log directory.
      */
-    public function getFiles($dir){
+    public function getFiles($dir,$url=null){
+        // dd($url);
         $fileNames = [];
         $path = storage_path('logs');
         $files = File::allFiles($path.'/'.$dir);
