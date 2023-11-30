@@ -13,6 +13,12 @@ Run a command,
 composer require mansi/website-analytics
 ```
 
+To publish configurations,
+
+```
+php artisan vendor:publish --tag=analysis_view
+```
+
 Usage
 -----
 Show Analysis of module wise work-log files and it's work-log.
